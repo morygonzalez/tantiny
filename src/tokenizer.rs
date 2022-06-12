@@ -1,18 +1,19 @@
+use lindera::mode::{Mode, Penalty};
+use lindera::tokenizer::{DictionaryType, TokenizerConfig, UserDictionaryType};
+use lindera_tantivy::tokenizer::LinderaTokenizer;
+use rutie::{methods, Array, Boolean, Integer, Object, RString};
+use tantivy::tokenizer::{
+    LowerCaser, NgramTokenizer, RemoveLongFilter, SimpleTokenizer, Stemmer, TextAnalyzer,
+};
 
-use rutie::{methods, Object, Array, RString, Integer, Boolean};
-use tantivy::tokenizer::{TextAnalyzer, SimpleTokenizer, RemoveLongFilter, LowerCaser, Stemmer, NgramTokenizer};
-
-use crate::helpers::{try_unwrap_params, scaffold, TryUnwrap, LanguageWrapper};
+use crate::helpers::{scaffold, try_unwrap_params, LanguageWrapper, TryUnwrap};
 
 pub struct TantinyTokenizer(pub(crate) TextAnalyzer);
 
 scaffold!(RTantinyTokenizer, TantinyTokenizer, "Tokenizer");
 
 fn wrap_tokenizer(tokenizer: TextAnalyzer) -> RTantinyTokenizer {
-    klass().wrap_data(
-        TantinyTokenizer(tokenizer),
-        &*TANTINY_TOKENIZER_WRAPPER
-    )
+    klass().wrap_data(TantinyTokenizer(tokenizer), &*TANTINY_TOKENIZER_WRAPPER)
 }
 
 pub(crate) fn unwrap_tokenizer(tokenizer: &RTantinyTokenizer) -> &TextAnalyzer {
@@ -64,6 +65,20 @@ methods!(
         wrap_tokenizer(TextAnalyzer::from(tokenizer))
     }
 
+    fn new_lindera_tokenizer() -> RTantinyTokenizer {
+        let config = TokenizerConfig {
+            dict_type: DictionaryType::Ipadic,
+            dict_path: None,
+            user_dict_path: None,
+            user_dict_type: UserDictionaryType::Csv,
+            mode: Mode::Decompose(Penalty::default()),
+        };
+
+        let tokenizer = LinderaTokenizer::with_config(config);
+
+        wrap_tokenizer(TextAnalyzer::from(tokenizer))
+    }
+
     fn extract_terms(text: RString) -> Array {
         try_unwrap_params!(text: String);
 
@@ -89,6 +104,7 @@ pub(super) fn init() {
         klass.def_self("__new_simple_tokenizer", new_simple_tokenizer);
         klass.def_self("__new_stemmer_tokenizer", new_stemmer_tokenizer);
         klass.def_self("__new_ngram_tokenizer", new_ngram_tokenizer);
+        klass.def_self("__new_lindera_tokenizer", new_lindera_tokenizer);
         klass.def("__extract_terms", extract_terms);
     });
-} 
+}

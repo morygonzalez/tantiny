@@ -1,10 +1,13 @@
+use rutie::{methods, AnyObject, Array, Hash, Integer, NilClass, Object, RString};
 use std::collections::HashMap;
 use std::str::FromStr;
-use rutie::{methods, Object, AnyObject, Integer, NilClass, Array, RString, Hash};
-use tantivy::{doc, Document, Term, ReloadPolicy, Index, IndexWriter, IndexReader, DateTime};
-use tantivy::schema::{Schema, TextOptions, TextFieldIndexing, IndexRecordOption, FacetOptions, STRING, STORED, INDEXED, FAST};
 use tantivy::collector::TopDocs;
 use tantivy::directory::MmapDirectory;
+use tantivy::schema::{
+    FacetOptions, IndexRecordOption, Schema, TextFieldIndexing, TextOptions, FAST, INDEXED, STORED,
+    STRING,
+};
+use tantivy::{doc, DateTime, Document, Index, IndexReader, IndexWriter, ReloadPolicy, Term};
 
 use crate::helpers::{scaffold, try_unwrap_params, TryUnwrap};
 use crate::query::{unwrap_query, RTantinyQuery};
@@ -113,7 +116,7 @@ methods!(
             .reload_policy(ReloadPolicy::Manual)
             .try_into()
             .try_unwrap();
-        
+
         klass().wrap_data(
             TantinyIndex { index, index_writer, index_reader, schema },
             &*TANTINY_INDEX_WRAPPER
@@ -285,4 +288,4 @@ pub(super) fn init() {
         klass.def("__reload", reload);
         klass.def("__search", search);
     });
-} 
+}

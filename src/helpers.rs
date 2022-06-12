@@ -1,10 +1,10 @@
+use rutie::{AnyException, Array, Boolean, Exception, Float, Hash, Integer, Module, RString};
 use std::collections::HashMap;
-use rutie::{AnyException, Array, Exception, RString, Hash, Integer, Float, Boolean, Module};
 use tantivy::tokenizer::Language;
 
 // Macro dependencies:
 pub(super) use paste::paste;
-pub(super) use rutie::{class, wrappable_struct, AnyObject, VerifiedObject, VM, Object, Class};
+pub(super) use rutie::{class, wrappable_struct, AnyObject, Class, Object, VerifiedObject, VM};
 
 pub(crate) fn namespace() -> Module {
     Module::from_existing("Tantiny")
@@ -69,8 +69,9 @@ primitive_try_unwrap_impl!(Integer, i64);
 primitive_try_unwrap_impl!(Float, f64);
 primitive_try_unwrap_impl!(Boolean, bool);
 
-impl<T> TryUnwrap<Vec<T>> for Array where
-    AnyObject: TryUnwrap<T>
+impl<T> TryUnwrap<Vec<T>> for Array
+where
+    AnyObject: TryUnwrap<T>,
 {
     fn try_unwrap(self) -> Vec<T> {
         let mut vec = Vec::new();
@@ -83,9 +84,10 @@ impl<T> TryUnwrap<Vec<T>> for Array where
     }
 }
 
-impl<K, V> TryUnwrap<HashMap<K, V>> for Hash where
+impl<K, V> TryUnwrap<HashMap<K, V>> for Hash
+where
     AnyObject: TryUnwrap<K> + TryUnwrap<V>,
-    K: Eq + std::hash::Hash
+    K: Eq + std::hash::Hash,
 {
     fn try_unwrap(self) -> HashMap<K, V> {
         let mut hashmap = HashMap::new();
@@ -120,8 +122,8 @@ impl<T> TryUnwrap<T> for Option<T> {
         } else {
             VM::raise_ex(AnyException::new(
                 "Tantiny::UnexpectedNone",
-                Some(&*format!("{}", std::any::type_name::<T>())))
-            );
+                Some(&*format!("{}", std::any::type_name::<T>())),
+            ));
 
             self.unwrap()
         }
@@ -167,7 +169,7 @@ macro_rules! scaffold {
         // There is a bug in Rutie which prevents using this macro
         // by resolving it by a full path, so the only workaround is:
         use crate::helpers::wrappable_struct;
-         
+
         $crate::helpers::paste! {
             wrappable_struct!(
                 $type,
@@ -196,7 +198,7 @@ macro_rules! scaffold {
                 concat!("Error converting to ", stringify!($ruby_type), ".")
             }
         }
-    }
+    };
 }
 
 pub(crate) use scaffold;

@@ -13,6 +13,8 @@ rutie = "0.8"
 tantivy = "0.16"
 lazy_static = "1.4"
 paste = "1.0"
+lindera = { version = "0.13.4", features = ["full"] }
+lindera-tantivy = { version = "0.13.4", features = ["ipadic"] }
 
 [package.metadata.thermite]
 github_releases = true
