@@ -15,6 +15,7 @@ lazy_static = "1.4"
 paste = "1.0"
 rayon = "=1.8.1"
 rayon-core = "=1.12.1"
+tempfile = ">=3, <3.25"
 
 [package.metadata.thermite]
 github_releases = true
