@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
     "source_code_uri" => "https://github.com/baygeldin/tantiny"
   }
 
-  spec.required_ruby_version = ">= 2.7"
+  spec.required_ruby_version = ">= 3.1"
 
   spec.files = [
     Dir.glob("bin/**/*"),
